@@ -4,7 +4,7 @@
 * @Date: 2018-06-08 21:31:55
 * @Description: 首页入口组件
  * @Last Modified by: zhanghongqiao
- * @Last Modified time: 2019-09-04 13:52:04
+ * @Last Modified time: 2019-09-04 22:49:47
 */
 
  <template>
@@ -101,7 +101,7 @@ export default {
         adcode: [code],
         depth: dep,
         styles: {
-          fill: '#7c91d4',
+          fill: "#7c91d4",
           "fill-opacity": "0.5",
           stroke: "red",
           "province-stroke": "cornflowerblue",
@@ -128,56 +128,188 @@ export default {
       pathData.map((item, index) => {
         this.renderWalking(item, index);
       });
+      //  this.renderWalkin
     },
-     
 
     // 画轨迹线
     renderWalking(lines, index) {
       // let path = this.parseRouteToPath(route)
 
       let path = [];
+      // path.push(new AMap.LngLat(107.2, 36))
       lines.map(item => {
         path.push(new AMap.LngLat(item[1], item[0]));
       });
-     
-      
+      console.log('path', path)
+      var object3Dlayer = new AMap.Object3DLayer();
+      var numberOfPoints = 100;
+      var minHeight = 20;
       // gps经纬度转高德
-      AMap.convertFrom(path, "gps", (status, result) => {
-        if (result.info === "ok") {
-          let lnglats = result.locations;
-          for (let i = 0, len = lnglats.length; i < len; i++) {
-            this.routeLine = new AMap.Polyline({
-              path: path,
-              isOutline: true,
-              outlineColor: colors[index],
-              borderWeight: 1,
-              strokeColor: colors2[index],
-              strokeOpacity: 0.1,
-              strokeWeight: 2,
-              strokeStyle: "solid",
-              lineJoin: 'round',
-              lineCap: 'round',
-            });
-            this.routeLine.setMap(this.map);
+           
+          //   var meshLine = new AMap.Object3D.MeshLine({
+          //     // path: path,
+          //     path: computeBezier(path, numberOfPoints, minHeight),
+          //     height: getEllipseHeight(numberOfPoints, 100000, minHeight),
+          //     color: colors[index],
+          //     width: 3
+          //   });
+          //   meshLine.transparent = true;
+          //   object3Dlayer.add(meshLine);
+          //   meshLine["backOrFront"] = "both";
+          //   this.map.add(object3Dlayer);
+          // // }
+          // function pointOnCubicBezier(cp, t) {
+          //   var ax, bx, cx;
+          //   var ay, by, cy;
+          //   var tSquared, tCubed;
+          
+          //   cx = 3.0 * (cp[1].lng - cp[0].lng);
+          //   bx = 3.0 * (cp[2].lng - cp[1].lng) - cx;
+          //   ax = cp[3].lng - cp[0].lng - cx - bx;
+
+          //   cy = 3.0 * (cp[1].lat - cp[0].lat);
+          //   by = 3.0 * (cp[2].lat - cp[1].lat) - cy;
+          //   ay = cp[3].lat - cp[0].lat - cy - by;
+
+          //   tSquared = t * t;
+          //   tCubed = tSquared * t;
+
+          //   var lng = ax * tCubed + bx * tSquared + cx * t + cp[0].lng;
+          //   var lat = ay * tCubed + by * tSquared + cy * t + cp[0].lat;
+
+          //   return new AMap.LngLat(lng, lat);
+          // }
+
+          // function computeBezier(points, numberOfPoints) {
+          //   var dt;
+          //   var i;
+          //   var curve = [];
+          //   dt = 1.0 / (numberOfPoints - 1);
+          //   for (i = 0; i < numberOfPoints; i++) {
+          //     curve[i] = pointOnCubicBezier(points, i * dt);
+ 
+          //   }
+          //   return curve;
+          // }
+
+          // function getEllipseHeight(count, maxHeight, minHeight) {
+          //   var height = [];
+          //   var radionUnit = Math.PI / 180;
+          //   for (var i = 0; i < count; i++) {
+          //     var radion = i * radionUnit;
+          //     height.push(minHeight + Math.sin(radion) * maxHeight);
+          //   }
+          //   return height;
+          // }
+
+           var points = [
+              new AMap.LngLat(116.400433, 39.908084),
+              new AMap.LngLat(113.52412, 34.777709),
+              new AMap.LngLat(108.821972, 34.270829),
+              new AMap.LngLat(104.067108, 30.65769)
+          ];
+
+      var map = this.map
+
+          var object3Dlayer = new AMap.Object3DLayer();
+          var numberOfPoints = 180;
+          var minHeight = 20;
+
+          var meshLine = new AMap.Object3D.MeshLine({
+              // path: computeBezier(path, numberOfPoints, minHeight),
+              // path: path,
+              // path: points,
+              path: computeBezier(path, numberOfPoints, minHeight),              
+              height: getEllipseHeight(numberOfPoints, 400000 , minHeight),
+              color: colors[index],
+              width: 2
+          });
+
+          meshLine.transparent = true;
+          object3Dlayer.add(meshLine);
+          meshLine['backOrFront'] = 'both';
+          map.add(object3Dlayer);
+
+          function pointOnCubicBezier(cp, t) {
+              var ax, bx, cx;
+              var ay, by, cy;
+              var tSquared, tCubed;
+console.log(cp, 'cp')
+              cx = 3.0 * (cp[1].lng - cp[0].lng);
+              bx = 3.0 * (cp[2].lng - cp[1].lng) - cx;
+              ax = cp[3].lng - cp[0].lng - cx - bx;
+
+              cy = 3.0 * (cp[1].lat - cp[0].lat);
+              by = 3.0 * (cp[2].lat - cp[1].lat) - cy;
+              ay = cp[3].lat - cp[0].lat - cy - by;
+
+              tSquared = t * t;
+              tCubed = tSquared * t;
+
+              var lng = (ax * tCubed) + (bx * tSquared) + (cx * t) + cp[0].lng;
+              var lat = (ay * tCubed) + (by * tSquared) + (cy * t) + cp[0].lat;
+console.log(lng, lat)
+
+              return new AMap.LngLat(lng, lat);
           }
-        }
- 
-         var icon  = new AMap.Icon({
-          size: [10, 5],
-          image: "https://webapi.amap.com/images/car.png",
-          imageSize: [10, 5]
-        })
-       var marker = new AMap.Marker({
-          map: this.map,
-          position: path[0],
-          icon: icon,
-          autoRotation: true,
-          angle:-90,
-          offset: new AMap.Pixel(0, 0),
+
+          function computeBezier(points, numberOfPoints) {
+              var dt;
+              var i;
+              var curve = [];
+
+              dt = 1.0 / (numberOfPoints - 1);
+
+              for (i = 0; i < numberOfPoints; i++) {
+                  curve[i] = pointOnCubicBezier(points, i * dt);
+                  console.log('-----------------------------', i)
+              }
+
+              return curve;
+          }
+
+          function getEllipseHeight(count, maxHeight, minHeight) {
+              var height = [];
+              var radionUnit = Math.PI / 180;
+
+              for (var i = 0; i < count; i++) {
+                  var radion = i * radionUnit;
+                  if (i===0) {
+                  height.push(minHeight);
+                    
+                  } else {
+                  height.push(minHeight + Math.sin(radion) * maxHeight);
+                    
+
+                  }
+              }
+
+              return height;
+          }
+    },
+
+    rendeMoveMarker(path) {
+      var icon = new AMap.Icon({
+        size: [10, 5],
+        image: "https://webapi.amap.com/images/car.png",
+        imageSize: [10, 5]
       });
-       marker.moveAlong(path.reverse(), 200000, function(k){return k}, true);
+      var marker = new AMap.Marker({
+        map: this.map,
+        position: path[0],
+        icon: icon,
+        autoRotation: true,
+        angle: -90,
+        offset: new AMap.Pixel(0, 0)
       });
- 
+      marker.moveAlong(
+        path.reverse(),
+        200000,
+        function(k) {
+          return k;
+        },
+        true
+      );
     },
     // 使用基础控件
     loadBasicControl() {

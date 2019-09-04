@@ -4,7 +4,7 @@
 * @Date: 2018-06-08 21:31:55
 * @Description: 首页入口组件
  * @Last Modified by: zhanghongqiao
- * @Last Modified time: 2019-09-04 17:32:18
+ * @Last Modified time: 2019-09-04 13:52:04
 */
 
  <template>
@@ -101,7 +101,7 @@ export default {
         adcode: [code],
         depth: dep,
         styles: {
-          fill: "#7c91d4",
+          fill: '#7c91d4',
           "fill-opacity": "0.5",
           stroke: "red",
           "province-stroke": "cornflowerblue",
@@ -129,6 +129,7 @@ export default {
         this.renderWalking(item, index);
       });
     },
+     
 
     // 画轨迹线
     renderWalking(lines, index) {
@@ -138,91 +139,45 @@ export default {
       lines.map(item => {
         path.push(new AMap.LngLat(item[1], item[0]));
       });
-      console.log('path', path)
-      var object3Dlayer = new AMap.Object3DLayer();
-      var numberOfPoints = 100;
-      var minHeight = 20;
+     
+      
       // gps经纬度转高德
-           
-            var meshLine = new AMap.Object3D.MeshLine({
-              // path: path,
-              path: computeBezier(path, numberOfPoints, minHeight),
-              height: getEllipseHeight(numberOfPoints, 200000, minHeight),
-              color: colors[index],
-              width: 3
+      AMap.convertFrom(path, "gps", (status, result) => {
+        if (result.info === "ok") {
+          let lnglats = result.locations;
+          for (let i = 0, len = lnglats.length; i < len; i++) {
+            this.routeLine = new AMap.Polyline({
+              path: path,
+              isOutline: true,
+              outlineColor: colors[index],
+              borderWeight: 1,
+              strokeColor: colors2[index],
+              strokeOpacity: 0.1,
+              strokeWeight: 2,
+              strokeStyle: "solid",
+              lineJoin: 'round',
+              lineCap: 'round',
             });
-            meshLine.transparent = true;
-            object3Dlayer.add(meshLine);
-            meshLine["backOrFront"] = "both";
-            this.map.add(object3Dlayer);
-          // }
-          function pointOnCubicBezier(cp, t) {
-            var ax, bx, cx;
-            var ay, by, cy;
-            var tSquared, tCubed;
-          
-            cx = 2.0 * (cp[1].lng - cp[0].lng);
-            bx = 2.0 * (cp[2].lng - cp[1].lng) - cx;
-            ax = cp[3].lng - cp[0].lng - cx - bx;
-
-            cy = 2.0 * (cp[1].lat - cp[0].lat);
-            by = 2.0 * (cp[2].lat - cp[1].lat) - cy;
-            ay = cp[3].lat - cp[0].lat - cy - by;
-
-            tSquared = t * t;
-            tCubed = tSquared * t;
-
-            var lng = ax * tCubed + bx * tSquared + cx * t + cp[0].lng;
-            var lat = ay * tCubed + by * tSquared + cy * t + cp[0].lat;
-
-            return new AMap.LngLat(lng, lat);
+            this.routeLine.setMap(this.map);
           }
-
-          function computeBezier(points, numberOfPoints) {
-            var dt;
-            var i;
-            var curve = [];
-            dt = 1.0 / (numberOfPoints - 1);
-            for (i = 0; i < numberOfPoints; i++) {
-              curve[i] = pointOnCubicBezier(points, i * dt);
+        }
  
-            }
-            return curve;
-          }
-
-          function getEllipseHeight(count, maxHeight, minHeight) {
-            var height = [];
-            var radionUnit = Math.PI / 180;
-            for (var i = 0; i < count; i++) {
-              var radion = i * radionUnit;
-              height.push(minHeight + Math.sin(radion) * maxHeight);
-            }
-            return height;
-          }
-    },
-
-    rendeMoveMarker(path) {
-      var icon = new AMap.Icon({
-        size: [10, 5],
-        image: "https://webapi.amap.com/images/car.png",
-        imageSize: [10, 5]
+         var icon  = new AMap.Icon({
+          size: [10, 5],
+          image: "https://webapi.amap.com/images/car.png",
+          imageSize: [10, 5]
+        })
+       var marker = new AMap.Marker({
+          map: this.map,
+          position: path[0],
+          icon: icon,
+          autoRotation: true,
+          angle:-90,
+          offset: new AMap.Pixel(0, 0),
       });
-      var marker = new AMap.Marker({
-        map: this.map,
-        position: path[0],
-        icon: icon,
-        autoRotation: true,
-        angle: -90,
-        offset: new AMap.Pixel(0, 0)
+       marker.moveAlong(path.reverse(), 200000, function(k){return k}, true);
       });
-      marker.moveAlong(
-        path.reverse(),
-        200000,
-        function(k) {
-          return k;
-        },
-        true
-      );
+ 
     },
     // 使用基础控件
     loadBasicControl() {
