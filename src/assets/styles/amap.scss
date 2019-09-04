@@ -1,0 +1,38 @@
+#app {
+  .amap-ui-control-theme-light .amap-ui-control-zoom a, 
+  .amap-ui-control-theme-light .amap-ui-control-zoom-num {
+    background-color: #29396a;
+    border-bottom-color: #ccc;
+    color: #fff;
+    border: none;
+    margin-bottom: 1px;
+  }
+  .amap-ui-control-theme-light .amap-ui-control-zoom {
+    border: none;
+  }
+  .amap-ui-control-theme-light .amap-ui-control-zoom a:hover {
+    background-color: #29396a;
+  }
+  .amap-ui-control-zoom a, .amap-ui-control-zoom-num {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 18px;
+    
+  }
+  .amap-ui-control-position-rt, .amap-ui-control-position-tr {
+    right: 18px;
+    top: 50px;
+    z-index: 99;
+  }
+  .amap-ui-control-zoom {
+    width: 24px;
+  }
+  .amap-ranging-label {
+    color: #000;
+  }
+  .amap-logo,
+  .amap-copyright {
+    display: none !important;
+  }
+}
